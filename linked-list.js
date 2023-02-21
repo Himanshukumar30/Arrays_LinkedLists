@@ -1,5 +1,8 @@
 /** Node: node for a singly linked list. */
 
+const { get } = require("http");
+const { default: nodeTest } = require("node:test");
+
 class Node {
   constructor(val) {
     this.val = val;
@@ -21,55 +24,152 @@ class LinkedList {
   /** push(val): add new value to end of list. */
 
   push(val) {
+    const newNode = new Node(val);
 
+    if (!this.head) {
+      this.head = newNode;
+      this.tail = newNode;
+    }
+    this.tail.next = newNode;
+    this.tail = newNode;
+
+    this.length += 1;
   }
 
   /** unshift(val): add new value to start of list. */
 
   unshift(val) {
+    const newNode = new Node(val);
+    if (this.head === null) {
+      this.head = newNode;
+    } else {
+      newNode.next = this.head;
+      this.head = newNode;
+    }
 
+    if (this.length === 0) this.tail = this.head;
+
+    this.length += 1;
   }
 
   /** pop(): return & remove last item. */
 
   pop() {
-
+    return this.removeAt(this.length - 1);
+    this.length -= 1;
   }
 
   /** shift(): return & remove first item. */
 
   shift() {
-
+    return this.removeAt(0);
+    this.length -= 1;
   }
 
   /** getAt(idx): get val at idx. */
 
   getAt(idx) {
+    if (idx < 0 || idx >= this.length) {
+      throw new Error("Invalid index");
+    } else {
+      get(idx);
+    }
+  }
 
+  get(idx) {
+    let currentNode = this.head;
+    let count = 0;
+
+    while (currentNode !== null && count != idx) {
+      count += 1;
+      currentNode = currentNode.next;
+    }
+
+    return currentNode;
   }
 
   /** setAt(idx, val): set val at idx to val */
 
   setAt(idx, val) {
-
+    if (idx < 0 || idx >= this.length) {
+      throw new Error("Invalid index");
+    } else {
+      let currentNode = get(idx);
+      currentNode.val = val;
+    }
   }
 
   /** insertAt(idx, val): add node w/val before idx. */
 
   insertAt(idx, val) {
+    if (idx > this.length || idx < 0) {
+      throw new Error("Invalid index.");
+    }
 
+    if (idx === 0) return this.unshift(val);
+    if (idx === this.length) return this.push(val);
+
+    // get the one before it
+    let previous = this.get(idx - 1);
+
+    let newNode = new Node(val);
+    newNode.next = previous.next;
+    previous.next = newNode;
+
+    this.length += 1;
   }
 
   /** removeAt(idx): return & remove item at idx, */
 
   removeAt(idx) {
+    if (idx >= this.length || idx < 0) {
+      throw new Error("Invalid index.");
+    }
 
+    // special case: remove first item
+
+    if (idx === 0) {
+      let val = this.head.val;
+      this.head = this.head.next;
+      this.length -= 1;
+      if (this.length < 2) this.tail = this.head;
+      return val;
+    }
+
+    let previous = this.get(idx - 1);
+
+    // special case: remove tail
+
+    if (idx === this.length - 1) {
+      let val = previous.next.val;
+      previous.next = null;
+      this.tail = previous;
+      this.length -= 1;
+      return val;
+    }
+
+    // normal case: remove in middle
+
+    let val = previous.next.val;
+    previous.next = previous.next.next;
+    this.length -= 1;
+    return val;
   }
 
   /** average(): return an average of all values in the list */
 
   average() {
-    
+    if (this.length === 0) return 0;
+
+    let total = 0;
+    let current = this.head;
+
+    while (current) {
+      total += current.val;
+      current = current.next;
+    }
+
+    return total / this.length;
   }
 }
 
